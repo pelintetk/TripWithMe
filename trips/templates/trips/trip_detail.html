@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>TripDetail</title>
+        <style>
+            #budget-progress {
+                width: 300px;
+                height: 20px;
+                background-color: #ddd;
+                border-radius: 10px;
+                overflow: hidden;
+            }
+
+            #budget-bar{
+                width: 0%;
+                height: 100%;
+                background-color: pink;
+            }
+        </style>
+    </head>
+    <body>
+        <h1> {{ trip.name }} </h1>
+        <p> {{trip.city}} , {{trip.country}} </p>
+        <p> {{trip.start_date}} - {{trip.end_date}} </p>
+        <p> {{ trip.get_trip_type_display }} </p>
+        {% if trip.budget %}
+            <h3>Budget Summary</h3>
+
+            <p>
+                <strong>Budget:</strong>
+                {{ trip.budget }} {{ trip.get_budget_currency_display }}
+            </p>
+
+            <p>
+                <strong>Spent:</strong>
+                {{spent}} {{trip.get_budget_currency_display}}
+            </p>
+
+            <p>
+                <strong>Remaining:</strong>
+                {{remaining}} {{trip.get_budget_currency_display}}
+            </p>
+
+            <div id="budget-progress" 
+                data-budget="{{ trip.budget }}" 
+                data-spent="{{ spent }}"
+            >
+                <div id="budget-bar"></div>
+            </div>
+
+            <p id="budget-percentage"></p>
+
+        {% endif %}
+
+        <h2>CheckList</h2>
+        {% for item in checklist_items %}
+            <p>
+                <input 
+                type = "checkbox" 
+                data-item-id="{{ item.id }}"
+                {% if item.completed %}checked{% endif %}
+                >
+                {{item.text}}
+            </p>
+        {% endfor %}
+        <form method="POST">
+            {% csrf_token %}
+
+            <input type="text" name="text" placeholder="Add checklist item.">
+            <input type="submit" name="add_checklist" value="Add">
+        </form>
+
+        <hr>
+
+        <h2>Budget & Expenses</h2>
+
+        <h3>Total Spent</h3>
+        <p>€ {{eur_total}} EUR</p>
+        <p>$ {{usd_total}} USD</p>
+        <p>₺ {{try_total}} TRY</p>
+
+        <h3>By Category</h3>
+
+        {% for item in category_totals %}
+            <p>
+                {{ item.category }}
+                - {{ item.total }}
+                {{ item.currency }}
+            </p>
+        {% endfor %}
+
+        <form method="POST">
+            {% csrf_token %}
+            <input 
+                type="text"
+                name="description"
+                placeholder="Where / What ?">
+
+            <input 
+                type="number"
+                name="amount"
+                step="0.01"
+                placeholder="=Amount">
+            
+            <select name="currency">
+                <option value="TRY">₺ TRY</option>
+                <option value="USD">$ USD</option>
+                <option value="EUR">€ EUR</option>
+            </select>
+
+            <select name="category">
+                <option value="food">Food</option>
+                <option value="transport">Transportation</option>
+                <option value="accommodation">Accommodation</option>
+                <option value="shopping">Shopping</option>
+                <option value="activity">Activities</option>
+                <option value="other">Other</option>
+            </select>
+
+            <input type="submit" name="add_expense" value="Add expense">
+        </form>
+
+        {%for expense in expenses%}
+            <p>
+                {{ expense.description }}
+                - {{expense.amount}}
+                {{expense.currency}}
+                - {{expense.get_category_display}}
+
+                <form action ="{% url 'delete_expense' expense.id %}"
+                    method="POST"
+                    style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit">Delete</button>
+                </form>
+            </p>
+        {% endfor %}
+
+        <script>
+            const csrfToken = document.querySelector(
+                '[name=csrfmiddlewaretoken]'
+            ).value;
+            document.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox){
+                checkbox.addEventListener('change',function(){
+                    console.log(this.dataset.itemId);
+                    console.log(this.checked);
+                    fetch(`/checklist/${this.dataset.itemId}/toggle/`,{
+                        method:"POST",
+                        headers : {
+                            "X-CSRFToken":csrfToken
+                        }
+                    });
+                });
+            });
+
+            const budgetProgress = document.querySelector("#budget-progress");
+            console.log(budgetProgress);
+
+            if(budgetProgress){
+                const budget = parseFloat(budgetProgress.dataset.budget);
+                const spent = parseFloat(budgetProgress.dataset.spent);
+                const percentage = (spent/budget) * 100;
+                const budgetBar = document.querySelector("#budget-bar");
+
+                budgetBar.style.width = percentage + "%";
+
+                document.querySelector("#budget-percentage").textContent = percentage.toFixed(1) + "%spent";
+
+                console.log("Budget:", budget);
+                console.log("Spent:", spent);
+                console.log("Percentage:", percentage);
+            }
+
+        </script>
+    </body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>TripWithMe</title>
+    </head>
+    <body>
+        <h1>Trip With Me</h1>
+
+        <a href="{% url 'create_trip' %}">Create Trip</a>
+        <a href="{% url 'logout' %}">Logout</a>
+
+        <p>Travel. Compare. Decide. </p>
+        {% for trip in trips %}
+            <h2>
+                <a href="{% url 'trip_detail' trip.id %}">
+                    {{ trip.name }}
+                </a>
+            </h2>
+            <p> {{trip.city}} , {{trip.country}} </p>
+            <p> {{trip.start_date}} -> {{trip.end_date}} </p>
+            <p> {{trip.get_trip_type_display}} </p>
+        {% endfor %}
+    </body>
+</html>

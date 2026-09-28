@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Register |   TripWithMe</title>
+    </head>
+    <body>
+        <h1>Register</h1>
+
+        {% if message %}
+            <p>{{ message }}</p>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            <input type="text" name="username">
+            <input type="password" name="password">
+            <input type="password" name="confirmation">
+            <input type="submit" value="Register">
+        </form>
+
+        <p>
+            Already have an account?
+            <a href="{% url 'login' %}">Login</a>
+        </p>
+    </body>
+</html>
