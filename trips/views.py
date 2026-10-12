@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
-from .models import Trip , ChecklistItem , Expense
+from .models import Trip , ChecklistItem , Expense , Place , SavedPlace
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.models import User
 from django.http import JsonResponse
@@ -159,10 +159,59 @@ def trip_detail(request,trip_id):
                 category = category
             )
 
+        if "save_place" in request.POST:
+            place_id = request.POST["place_id"]
+
+            place = Place.objects.get(id = place_id)
+
+            SavedPlace.objects.get_or_create(
+                trip=trip,
+                place=place
+            )
+
+        if "remove_place" in request.POST:
+            saved_places_ids = request.POST["saved_places_ids"]
+
+            saved_place = SavedPlace.objects.get(
+                id=saved_places_ids ,
+                trip=trip
+            )
+
+            saved_place.delete()
+
+        if "save_review" in request.POST:
+            saved_places_ids = request.POST["saved_places_ids"]
+
+            saved_place = SavedPlace.objects.get(
+                id= saved_places_ids,
+                trip=trip,
+                visited=True
+            )
+
+            rating = request.POST.get("rating")
+            review = request.POST.get("review", "")
+
+            if rating == "":
+                saved_place.rating = None
+            elif rating in ["1","2","3","4","5"]:
+                saved_place.rating = int(rating)
+            else:
+                return JsonResponse(
+                    {"error": "Rating must be between 1 and 5"},
+                    status=400
+                )
+
+            saved_place.review = review
+            saved_place.save()
         return redirect("trip_detail", trip_id=trip.id)
 
     checklist_items = trip.checklist_items.all()
     expenses = trip.expenses.all()
+    places = Place.objects.filter(city__iexact=trip.city)
+    saved_places = trip.saved_places.all()
+    saved_places_ids = list(
+        saved_places.values_list("place_id", flat=True)
+    )
     eur_expenses = expenses.filter(currency="EUR")
     usd_expenses = expenses.filter(currency="USD")
     try_expenses = expenses.filter(currency="TRY")
@@ -209,7 +258,10 @@ def trip_detail(request,trip_id):
         "try_total": try_total,
         "spent" : spent,
         "remaining" : remaining,
-        "category_totals": category_totals
+        "category_totals": category_totals,
+        "places" : places ,
+        "saved_places" : saved_places,
+        "saved_places_ids" : saved_places_ids
     })
 
 @login_required
@@ -239,3 +291,23 @@ def toggle_checklist_item(request, item_id):
     return JsonResponse({
         "success":True
     })
+
+@login_required
+def toggle_visited(request, saved_id):
+    saved_place = SavedPlace.objects.get(
+        id=saved_id,
+        trip__user=request.user
+    )
+
+    if request.method == "POST":
+        saved_place.visited = not saved_place.visited
+        saved_place.save()
+
+        return JsonResponse({
+            "success": True,
+            "visited": saved_place.visited
+        })
+
+    return JsonResponse({
+        "success": False
+    }, status=405)

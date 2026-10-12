@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Trip(models.Model):
     name = models.CharField(max_length=100)
@@ -90,3 +91,51 @@ class Expense(models.Model):
     def __str__(self):
         return self.description
 
+class Place(models.Model):
+    name = models.CharField(max_length=200)
+
+    city = models.CharField(max_length=100)
+
+    CATEGORY_CHOICES = [
+        ("food", "Food"),
+        ("cafe", "Cafe"),
+        ("attraction", "Attraction"),
+        ("shopping", "Shopping"),
+    ]
+
+    category = models.CharField(
+        max_length=20,
+        choices=CATEGORY_CHOICES
+    )
+
+    photo_url = models.URLField(max_length=1000, blank=True)
+
+    def __str__(self):
+        return self.name
+
+class SavedPlace(models.Model):
+    trip = models.ForeignKey(
+        Trip,
+        on_delete=models.CASCADE,
+        related_name="saved_places"
+    )
+
+    place= models.ForeignKey(
+        Place,
+        on_delete=models.CASCADE,
+        related_name="saved_in_trips"
+    )
+
+    visited = models.BooleanField(default=False)
+    rating = models.IntegerField(
+        null=True, 
+        blank=True,
+        validators=[
+            MaxValueValidator(1),
+            MaxValueValidator(5)
+        ]
+    )
+    review = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"{self.trip.name} - {self.place.name}"
