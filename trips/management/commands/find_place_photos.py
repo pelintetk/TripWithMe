@@ -1,11 +1,8 @@
 
 import requests
-
 from django.core.management.base import BaseCommand
 from trips.models import Place
 from trips.photo_service import search_place_photos
-
-
 class Command(BaseCommand):
     help = "Find photo candidates for places"
 
@@ -37,13 +34,59 @@ class Command(BaseCommand):
                 continue
 
             if photos:
-                photo = photos[0]
+                for index, photo in enumerate(photos, start=1):
+                    self.stdout.write(
+                        f"\n{index}. {photo['title']}"
+                    )
+                    self.stdout.write(
+                        f"   Photo: {photo['url']}"
+                    )
+                    self.stdout.write(
+                        f"   Source: {photo['description_url']}"
+                    )
+                    self.stdout.write(
+                        f"   License: {photo['license']}"
+                    )
 
-                self.stdout.write(f"Candidate: {photo['title']}")
-                self.stdout.write(f"URL: {photo['url']}")
-                self.stdout.write(
-                    f"Source: {photo['description_url']}"
+                choice = input(
+                    "Choose a photo (1-5), or 0 to skip: "
+                ).strip()
+
+                if not choice.isdigit():
+                    self.stdout.write("Invalid choice.")
+                    continue
+
+                choice = int(choice)
+
+                if choice == 0:
+                    self.stdout.write("Skipped.")
+                    continue
+
+                if choice > len(photos):
+                    self.stdout.write("Invalid choice.")
+                    continue
+
+                selected_photo = photos[choice - 1]
+
+                if not selected_photo["url"]:
+                    self.stdout.write("Photo URL missing.")
+                    continue
+
+                place.photo_url = selected_photo["url"]
+                place.photo_source_url = (
+                    selected_photo["description_url"] or ""
                 )
-                self.stdout.write(f"License: {photo['license']}")
+                place.photo_license = (
+                    selected_photo["license"] or ""
+                )
+                place.photo_artist = (
+                    selected_photo["artist"] or ""
+                )
+
+                place.save()
+
+                self.stdout.write(
+                    self.style.SUCCESS("Photo saved!")
+                )
             else:
                 self.stdout.write("No photo found.")

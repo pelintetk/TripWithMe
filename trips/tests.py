@@ -6,6 +6,9 @@ from .models import Trip , Expense , ChecklistItem , Place , SavedPlace
 from unittest.mock import patch
 from .models import ChecklistItem
 from decimal import Decimal
+from unittest.mock import patch
+from django.core.management import call_command
+from io import StringIO
 
 
 
@@ -1008,3 +1011,46 @@ class SavedPlaceTests(TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertIsNone(saved_place.rating)
         self.assertFalse(saved_place.review)
+
+class PlacePhotoCommandTest(TestCase):
+
+    @patch("builtins.input", return_value="1")
+    @patch("trips.management.commands.find_place_photos.search_place_photos")
+    def test_selected_photo_is_saved(self, mock_search, mock_input):
+
+        place = Place.objects.create(
+            name="Louvre Museum",
+            city="Paris",
+            category="attraction",
+        )
+
+        mock_search.return_value = [
+            {
+                "title": "Louvre exterior",
+                "url": "https://example.com/louvre.jpg",
+                "description_url": "https://example.com/source",
+                "license": "CC BY 4.0",
+                "artist": "Test Photographer",
+            }
+        ]
+
+        output = StringIO()
+
+        call_command("find_place_photos", "Paris", stdout=output)
+
+        place.refresh_from_db()
+
+        self.assertEqual(
+            place.photo_url,
+            "https://example.com/louvre.jpg"
+        )
+
+        self.assertEqual(
+            place.photo_license,
+            "CC BY 4.0"
+        )
+
+        self.assertEqual(
+            place.photo_artist,
+            "Test Photographer"
+        )

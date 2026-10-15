@@ -8,7 +8,7 @@ def search_place_photos(place_name, city):
     params = {
         "action": "query",
         "generator": "search",
-        "gsrsearch": f'filetype:bitmap "{place_name} {city}"',
+        "gsrsearch": f'filetype:bitmap "{place_name}" {city}',
         "gsrnamespace": 6,
         "gsrlimit": 5,
         "prop": "imageinfo",
