@@ -1,27 +1,207 @@
+
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>Register |   TripWithMe</title>
-    </head>
-    <body>
-        <h1>Register</h1>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | TripWithMe</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #f7f9fc, #eaf2f8);
+            color: #25354a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .register-card {
+            width: 100%;
+            max-width: 430px;
+            background: white;
+            padding: 42px 38px;
+            border-radius: 24px;
+            box-shadow: 0 15px 45px rgba(30, 60, 90, 0.08);
+        }
+
+        .heading {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .heading .icon {
+            font-size: 38px;
+        }
+
+        .heading h1 {
+            margin: 14px 0 8px;
+            font-size: 29px;
+        }
+
+        .heading p {
+            margin: 0;
+            color: #8291a3;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 19px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 9px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid #dce5ed;
+            border-radius: 12px;
+            font-size: 15px;
+            background: #fbfcfe;
+            color: #25354a;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #7a9fc5;
+            box-shadow: 0 0 0 3px rgba(122, 159, 197, 0.15);
+        }
+
+        .register-btn {
+            width: 100%;
+            padding: 15px;
+            margin-top: 8px;
+            border: none;
+            border-radius: 14px;
+            background: #567fa8;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .register-btn:hover {
+            background: #426b95;
+            transform: translateY(-2px);
+        }
+
+        .error-message {
+            padding: 12px 15px;
+            margin-bottom: 22px;
+            background: #fff0f0;
+            color: #b54747;
+            border-radius: 10px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .login-text {
+            margin: 28px 0 0;
+            text-align: center;
+            color: #8291a3;
+            font-size: 14px;
+        }
+
+        .login-text a {
+            color: #567fa8;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .login-text a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .register-card {
+                padding: 30px 24px;
+            }
+
+            .heading h1 {
+                font-size: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="register-card">
+
+        <div class="heading">
+            <div class="icon">🌍</div>
+            <h1>Start Your Journey</h1>
+            <p>Create your account and explore the world with TripWithMe.</p>
+        </div>
 
         {% if message %}
-            <p>{{ message }}</p>
+            <div class="error-message" role="alert">
+                {{ message }}
+            </div>
         {% endif %}
 
         <form method="POST">
             {% csrf_token %}
-            
-            <input type="text" name="username">
-            <input type="password" name="password">
-            <input type="password" name="confirmation">
-            <input type="submit" value="Register">
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="Choose a username"
+                    autocomplete="username"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Create a password"
+                    autocomplete="new-password"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="confirmation">Confirm Password</label>
+                <input
+                    type="password"
+                    id="confirmation"
+                    name="confirmation"
+                    placeholder="Repeat your password"
+                    autocomplete="new-password"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="register-btn">
+                Create Account →
+            </button>
         </form>
 
-        <p>
+        <p class="login-text">
             Already have an account?
-            <a href="{% url 'login' %}">Login</a>
+            <a href="{% url 'login' %}">Log In</a>
         </p>
-    </body>
+
+    </main>
+</body>
 </html>

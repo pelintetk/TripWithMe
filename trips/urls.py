@@ -14,5 +14,6 @@ urlpatterns = [
         "saved/<int:saved_id>/toggle-visited/",
         views.toggle_visited,
         name="toggle-visited"
-    )
+    ),
+    path("trip/<int:trip_id>/delete/", views.delete_trip, name="delete_trip")
 ]

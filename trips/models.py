@@ -110,6 +110,29 @@ class Place(models.Model):
 
     photo_url = models.URLField(max_length=1000, blank=True)
 
+
+    photo_source_url = models.URLField(
+        max_length=1000,
+        blank=True
+    )
+
+    photo_license = models.CharField(
+        max_length=100,
+        blank=True
+    )
+
+    photo_artist = models.TextField(
+        blank=True
+    )
+
+
+    geoapify_id = models.CharField(
+        max_length=200,
+        unique=True,
+        null=True,
+        blank=True
+    )
+
     def __str__(self):
         return self.name
 
@@ -128,7 +151,7 @@ class SavedPlace(models.Model):
 
     visited = models.BooleanField(default=False)
     rating = models.IntegerField(
-        null=True, 
+        null=True,
         blank=True,
         validators=[
             MaxValueValidator(1),

@@ -1,37 +1,260 @@
+
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>TripWithMe</title>
-    </head>
-    <body>
-        <form method="POST">
-            {% csrf_token %}
-            <label>Trip Name: </label>
-            <input type="text" name="name">
-            <label>City: </label>
-            <input type="text" name="city">
-            <label>Country: </label>
-            <input type="text" name="country">
-            <label>Start Date</label>
-            <input type="date" name="start_date">
-            <label>End Date</label>
-            <input type="date" name="end_date">
-            <label>Trip Type</label>
-            <select name="trip_type">
-                <option value="domestic">Domestic</option>
-                <option value="international">International</option>
-            </select>
-            <label>Budget:</label>
-            <input type="number" 
-                name="budget"
-                step="0.01"
-                placeholder="Budget">
-            <select name="budget_currency">
-                <option value="TRY">₺ TRY</option>
-                <option value="USD">$ USD</option>
-                <option value="EUR">€ EUR</option>
-            </select>
-            <input type="submit" value="Create Trip">
-        </form>
-    </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Trip | TripWithMe</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #f7f9fc, #eaf2f8);
+            color: #25354a;
+        }
+
+        .page-container {
+            max-width: 780px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #59738e;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .trip-card {
+            background: white;
+            padding: 42px;
+            border-radius: 24px;
+            box-shadow: 0 15px 45px rgba(30, 60, 90, 0.08);
+        }
+
+        .heading {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .heading .icon {
+            font-size: 34px;
+        }
+
+        .heading h1 {
+            margin: 12px 0 8px;
+            font-size: 30px;
+        }
+
+        .heading p {
+            color: #8291a3;
+            margin: 0;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 9px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #dce5ed;
+            border-radius: 12px;
+            font-size: 15px;
+            background: #fbfcfe;
+            color: #25354a;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #7a9fc5;
+            box-shadow: 0 0 0 3px rgba(122, 159, 197, 0.15);
+        }
+
+        .budget-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 18px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            margin-top: 12px;
+            border: none;
+            border-radius: 14px;
+            background: #567fa8;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .submit-btn:hover {
+            background: #426b95;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 600px) {
+            .page-container {
+                margin: 15px auto;
+            }
+
+            .trip-card {
+                padding: 25px 20px;
+            }
+
+            .form-row,
+            .budget-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .heading h1 {
+                font-size: 25px;
+            }
+        }
+
+        .form-error {
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            background: #fff0f0;
+            color: #b54747;
+            border-radius: 10px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="page-container">
+
+        <a href="{% url 'index' %}" class="back-link">
+            ← Back to My Trips
+        </a>
+
+        <div class="trip-card">
+
+            <div class="heading">
+                <div class="icon">✈️</div>
+                <h1>Plan Your Next Adventure</h1>
+                <p>Every great journey starts with a plan.</p>
+            </div>
+
+
+            {% if message %}
+                <p class="form-error" role="alert">{{ message }}</p>
+            {% endif %}
+
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="name">Trip Name</label>
+                    <input type="text" id="name" name="name"
+                           placeholder="e.g. Summer in Italy" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <input type="text" id="city" name="city"
+                               placeholder="e.g. Rome" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="country">Country</label>
+                        <input type="text" id="country" name="country"
+                               placeholder="e.g. Italy" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="start_date">Start Date</label>
+                        <input type="date" id="start_date"
+                               name="start_date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="end_date">End Date</label>
+                        <input type="date" id="end_date"
+                               name="end_date" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="trip_type">Trip Type</label>
+                    <select id="trip_type" name="trip_type">
+                        <option value="domestic">Domestic</option>
+                        <option value="international">International</option>
+                    </select>
+                </div>
+
+                <div class="budget-row">
+                    <div class="form-group">
+                        <label for="budget">Budget</label>
+                        <input type="number" id="budget"
+                               name="budget" step="0.01" min="0"
+                               placeholder="Enter your budget" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="budget_currency">Currency</label>
+                        <select id="budget_currency" name="budget_currency">
+                            <option value="TRY">₺ TRY</option>
+                            <option value="USD">$ USD</option>
+                            <option value="EUR">€ EUR</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    Create My Trip ✈️
+                </button>
+            </form>
+
+        </div>
+    </div>
+
+    <script>
+        const startDate = document.querySelector("#start_date");
+        const endDate = document.querySelector("#end_date");
+
+        startDate.addEventListener("change", function() {
+            endDate.min = startDate.value;
+
+            if (endDate.value && endDate.value < startDate.value) {
+                endDate.value = "";
+            }
+        });
+    </script>
+</body>
 </html>
