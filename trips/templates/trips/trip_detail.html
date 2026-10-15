@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>TripDetail</title>
         <style>
 
@@ -611,6 +612,53 @@
                 background: #ffe0e0;
                 color: #a92f2f;
             }
+            .trip-header-content {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 24px;
+            }
+
+            .trip-header-info {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .trip-header-decoration {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                min-width: 170px;
+            }
+
+            .trip-decoration-emoji {
+                font-size: 72px;
+                line-height: 1.2;
+            }
+
+            .trip-decoration-text {
+                font-size: 14px;
+                color: #64748b;
+                font-weight: 500;
+            }
+
+            @media (max-width: 600px) {
+                .trip-header-content {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+
+                .trip-header-decoration {
+                    align-self: center;
+                    min-width: 0;
+                }
+
+                .trip-decoration-emoji {
+                    font-size: 52px;
+                }
+            }
 
         </style>
     </head>
@@ -631,10 +679,18 @@
                     🗑️ Delete Trip
                 </button>
             </form>
-            <h1> {{ trip.name }} </h1>
-            <p>📍 {{trip.city}} , {{trip.country}} </p>
-            <p>📅 {{trip.start_date}} - {{trip.end_date}} </p>
-            <p>✈️ {{ trip.get_trip_type_display }} </p>
+            <div class="trip-header-content">
+                <div class="trip-header-info">
+                    <h1>{{ trip.name }}</h1>
+                    <p>📍 {{ trip.city }}, {{ trip.country }}</p>
+                    <p>📅 {{ trip.start_date }} - {{ trip.end_date }}</p>
+                    <p>✈️ {{ trip.get_trip_type_display }}</p>
+                </div>
+                <div class="trip-header-decoration" aria-hidden="true">
+                    <span class="trip-decoration-emoji">🌍✈️</span>
+                    <span class="trip-decoration-text">Adventure awaits!</span>
+                </div>
+            </div>
         </div>
 
         <hr>
