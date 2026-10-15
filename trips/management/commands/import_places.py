@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from django.core.management.base import BaseCommand, CommandError
 
 from trips.models import Place
-
+from trips.photo_service import save_place_photo
 
 class Command(BaseCommand):
     help = "Import places from Geoapify into the database"
@@ -85,7 +85,7 @@ class Command(BaseCommand):
                     if not place_id or not name:
                         continue
 
-                    _, created = Place.objects.get_or_create(
+                    place , created = Place.objects.get_or_create(
                         geoapify_id=place_id,
                         defaults={
                             "name": name,
@@ -93,7 +93,13 @@ class Command(BaseCommand):
                             "category": local_category,
                         },
                     )
-
+                    try:
+                        save_place_photo(place)
+                    except requests.RequestException as error:
+                        self.stderr.write(
+                            f"Photo search failed for {place.name}: {error}"
+                    )
+                        
                     if created:
                         created_count += 1
 

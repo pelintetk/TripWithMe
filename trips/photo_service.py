@@ -48,3 +48,29 @@ def search_place_photos(place_name, city):
         })
 
     return photos
+
+def save_place_photo(place):
+    if place.photo_url:
+        return True
+
+    photos = search_place_photos(place.name, place.city)
+
+    for photo in photos:
+        if not photo.get("url"):
+            continue
+
+        place.photo_url = photo["url"]
+        place.photo_source_url = photo.get("description_url") or ""
+        place.photo_license = photo.get("license") or ""
+        place.photo_artist = photo.get("artist") or ""
+
+        place.save(update_fields=[
+            "photo_url",
+            "photo_source_url",
+            "photo_license",
+            "photo_artist",
+        ])
+
+        return True
+
+    return False
